@@ -6,7 +6,7 @@ module PartySerializer
       parties.starts_at,
       parties.ends_at,
       sweepstakes.name AS s_name,
-      sweepstakes.description AS s_desc')
+      sweepstakes.description AS s_desc').to_json(only: %(name parties_desc parties_name starts_at ends_at s_desc s_name))
   end
 
   def postgres_to_json

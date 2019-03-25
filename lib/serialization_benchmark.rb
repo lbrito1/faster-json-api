@@ -39,8 +39,8 @@ class SerializationBenchmark
     ActiveRecord::Base.logger = nil
 
     Party.extend(PartySerializer)
-    granularity = 2_500
-    max = 50_000
+    granularity = 1_000
+    max = 10_000
 
     csv_string = CSV.generate do |csv|
       csv << ['size', 'ruby-real', 'ruby-total', 'postgres-real', 'postgres-total']
