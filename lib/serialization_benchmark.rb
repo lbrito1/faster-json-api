@@ -1,4 +1,5 @@
 require 'benchmark'
+require 'csv'
 
 class SerializationBenchmark
   attr_accessor :parties
@@ -23,18 +24,33 @@ class SerializationBenchmark
     old_logger = ActiveRecord::Base.logger
     ActiveRecord::Base.logger = nil
 
-    puts 'Creating records...'
-    create_parties(n_parties: 1_000)
-
     Party.extend(PartySerializer)
+    granularity = 1_000
+    max = 10_000
 
-    Benchmark.bm(7) do |x|
-      x.report("ruby") { Party.ruby_to_json }
+    csv_string = CSV.generate do |csv|
+      csv << ['size', 'ruby-real', 'ruby-total', 'postgres-real', 'postgres-total']
+      (100..max).step(granularity) do |n|
+        puts "Creating #{n} records..."
+        create_parties(n_parties: n)
+
+        result = Benchmark.bm(7) do |x|
+          x.report("ruby") { Party.ruby_to_json }
+          x.report("postgres") { Party.postgres_to_json }
+        end
+
+        csv << [n, result[0].real, result[0].total, result[1].real, result[1].total]
+
+        puts 'Cleaning records...'
+        @parties.each(&:delete)
+      end
     end
+
+    File.write("./lib/output/benchmark_result_#{max}.csv", csv_string)
 
   ensure
     puts 'Cleaning records...'
-    @parties.each(&:delete)
+    @parties&.each(&:delete)
     ActiveRecord::Base.logger = old_logger
   end
 end
