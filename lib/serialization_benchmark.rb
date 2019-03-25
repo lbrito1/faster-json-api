@@ -7,12 +7,26 @@ class SerializationBenchmark
   def create_parties(n_parties:)
     ActiveRecord::Base.transaction do
       @parties = (1..n_parties).map do |i|
-        Party.create!(
+        p = Party.create!(
           name: "My awesome party #{i}",
           description: "Incredible awesomeness #{i}",
           starts_at: Time.new(2022, 1, 1, 20, 00) + i.days,
           ends_at: Time.new(2022, 1, 1, 23, 00) + i.days
         )
+
+        if i % 2 == 0
+          p.sweepstakes.create(
+            name: 'My awesome Sweepstake',
+            description: 'Pure incredibleness'
+          )
+
+          p.sweepstakes.create(
+            name: 'My second awesome Sweepstake',
+            description: 'Purer incredibleness'
+          )
+        end
+
+        p
       end
     end
 
@@ -25,8 +39,8 @@ class SerializationBenchmark
     ActiveRecord::Base.logger = nil
 
     Party.extend(PartySerializer)
-    granularity = 1_000
-    max = 10_000
+    granularity = 2_500
+    max = 50_000
 
     csv_string = CSV.generate do |csv|
       csv << ['size', 'ruby-real', 'ruby-total', 'postgres-real', 'postgres-total']

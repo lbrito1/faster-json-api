@@ -17,8 +17,10 @@ module PartySerializer
             'id', parties.id,
             'name', parties.name,
             'description', parties.description,
-            'starts_at', parties.starts_at,
-            'ends_at', parties.ends_at,
+            'dates', json_build_object(
+              'starts_at', starts_at,
+              'ends_at', ends_at
+            ),
             'sweepstakes', s.json_agg
           )
         )
@@ -28,7 +30,8 @@ module PartySerializer
             party_id,
             json_agg(
                json_build_object(
-                'name', name
+                'name', name,
+                'description', description
                )
             )
         FROM sweepstakes
