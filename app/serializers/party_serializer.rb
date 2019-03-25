@@ -1,6 +1,12 @@
 module PartySerializer
   def ruby_to_json
-    all.to_json(only: %i(name description starts_at ends_at))
+    Party.left_outer_joins(:sweepstakes).select('
+      parties.name AS parties_name,
+      parties.description AS parties_desc,
+      parties.starts_at,
+      parties.ends_at,
+      sweepstakes.name AS s_name,
+      sweepstakes.description AS s_desc')
   end
 
   def postgres_to_json
