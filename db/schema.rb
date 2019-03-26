@@ -32,12 +32,4 @@ ActiveRecord::Schema.define(version: 2019_03_22_161127) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "vips", force: :cascade do |t|
-    t.integer "party_id"
-    t.string "name"
-    t.string "description"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
 end
